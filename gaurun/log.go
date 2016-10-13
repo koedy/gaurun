@@ -3,10 +3,10 @@ package gaurun
 import (
 	"log"
 	"math"
-	"os"
 	"sync/atomic"
 	"time"
 
+	"github.com/client9/reopen"
 	"github.com/uber-go/zap"
 )
 
@@ -39,17 +39,21 @@ type LogPushEntry struct {
 	Expiry           int    `json:"expiry,omitempty"`
 }
 
-func InitLog(outString string) (zap.Logger, error) {
-	var writer zap.WriteSyncer
+type Reopener interface {
+	Reopen() error
+}
+
+func InitLog(outString string) (zap.Logger, Reopener, error) {
+	var writer reopen.Writer
 	switch outString {
 	case "stdout":
-		writer = os.Stdout
+		writer = reopen.Stdout
 	case "stderr":
-		writer = os.Stderr
+		writer = reopen.Stderr
 	default:
-		f, err := os.OpenFile(outString, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+		f, err := reopen.NewFileWriterMode(outString, 0644)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		writer = f
 	}
@@ -60,7 +64,8 @@ func InitLog(outString string) (zap.Logger, error) {
 			return zap.String("time", t.Local().Format("2006/01/02 15:04:05 MST"))
 		}),
 	)
-	return zap.New(encoder, zap.Output(writer), zap.ErrorOutput(writer)), nil
+	writeSyncer := zap.AddSync(writer)
+	return zap.New(encoder, zap.Output(writeSyncer), zap.ErrorOutput(writeSyncer)), writer, nil
 }
 
 func SetLogLevel(log zap.Logger, levelString string) error {
