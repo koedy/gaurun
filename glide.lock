@@ -1,8 +1,10 @@
-hash: 0bc9e45bdaab3068d78c415262597fba2a81b615ebb5d05b9c2fa9fffa12dca1
-updated: 2016-09-28T19:21:05.604054298+09:00
+hash: 7be7639ce25813836963145d661739a8421946a334b70f5dfee20bf934702eac
+updated: 2016-10-13T12:20:13.995810308+09:00
 imports:
 - name: github.com/BurntSushi/toml
   version: bbd5bb678321a0d6e58f1099321dfa73391c1b6f
+- name: github.com/client9/reopen
+  version: 4b86f9c0ead51cc410d05655596e30f281ed9071
 - name: github.com/fukata/golang-stats-api-handler
   version: e7ee1630fdb679c86ec8e3d0755e3576675fdb10
 - name: github.com/mercari/gcm
